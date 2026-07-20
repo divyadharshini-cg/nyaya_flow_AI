@@ -282,8 +282,27 @@ async def list_stats():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Caseload calculations offline: {str(e)}"
         )
+# Gateway Wrapper to handle routing both with and without prefix on Vercel/Local
+backend_app = app
+app = FastAPI(
+    title="NyayaFlow AI Gateway",
+    description="Gateway to access NyayaFlow backend service",
+    version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/api/backend", backend_app)
+app.mount("/", backend_app)
 
 if __name__ == "__main__":
     import uvicorn
     # Start webserver locally on port 8000
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
