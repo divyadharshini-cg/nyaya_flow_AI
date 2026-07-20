@@ -35,7 +35,11 @@ export default function CourthouseComponent() {
         <circle cx="100" cy="105" r="80" fill="url(#courtGlow)" />
 
         {/* Neural Network Nodes behind the courthouse */}
-        <g opacity="0.6">
+        <motion.g 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.6 }}
+          transition={{ duration: 1.2, delay: 0.2 }}
+        >
           <line x1="20" y1="130" x2="60" y2="60" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,3" />
           <line x1="60" y1="60" x2="100" y2="35" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,3" />
           <line x1="100" y1="35" x2="140" y2="60" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,3" />
@@ -44,27 +48,45 @@ export default function CourthouseComponent() {
           <circle cx="100" cy="35" r="4.5" fill="#f1c40f" className="animate-ping" />
           <circle cx="100" cy="35" r="3.5" fill="#d4af37" />
           <circle cx="140" cy="60" r="3" fill="#10b981" />
-        </g>
+        </motion.g>
 
         {/* The Courthouse Structure */}
         {/* Foundation steps */}
-        <rect x="25" y="165" width="150" height="7" rx="1.5" fill="url(#metalGold)" />
-        <rect x="30" y="157" width="140" height="8" rx="1" fill="#0f172a" stroke="url(#metalGold)" strokeWidth="1.5" />
-        <rect x="36" y="150" width="128" height="7" rx="1" fill="#0f172a" stroke="url(#metalGold)" strokeWidth="1" />
+        <motion.g 
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          style={{ originX: "100px" }}
+        >
+          <rect x="25" y="165" width="150" height="7" rx="1.5" fill="url(#metalGold)" />
+          <rect x="30" y="157" width="140" height="8" rx="1" fill="#0f172a" stroke="url(#metalGold)" strokeWidth="1.5" />
+          <rect x="36" y="150" width="128" height="7" rx="1" fill="#0f172a" stroke="url(#metalGold)" strokeWidth="1" />
+        </motion.g>
 
         {/* Pillars (6 standard visual pillars representing core pillars of justice) */}
         {/* Background glow for pillars */}
-        <g opacity="0.8">
+        <motion.g 
+          initial={{ scaleY: 0, opacity: 0 }}
+          animate={{ scaleY: 1, opacity: 0.8 }}
+          transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+          style={{ originY: "150px" }}
+        >
           <rect x="44" y="90" width="12" height="60" fill="url(#pillarGlow)" />
           <rect x="64" y="90" width="12" height="60" fill="url(#pillarGlow)" />
           <rect x="84" y="90" width="12" height="60" fill="url(#pillarGlow)" />
           <rect x="104" y="90" width="12" height="60" fill="url(#pillarGlow)" />
           <rect x="124" y="90" width="12" height="60" fill="url(#pillarGlow)" />
           <rect x="144" y="90" width="12" height="60" fill="url(#pillarGlow)" />
-        </g>
+        </motion.g>
 
         {/* Solid Pillars */}
-        <g fill="url(#metalGold)">
+        <motion.g 
+          initial={{ scaleY: 0, opacity: 0 }}
+          animate={{ scaleY: 1, opacity: 1 }}
+          transition={{ duration: 0.9, delay: 0.3, ease: "easeOut" }}
+          style={{ originY: "150px" }}
+          fill="url(#metalGold)"
+        >
           {/* Pillar 1 */}
           <rect x="46" y="90" width="8" height="60" rx="0.5" />
           <rect x="44" y="87" width="12" height="3" />
@@ -94,46 +116,63 @@ export default function CourthouseComponent() {
           <rect x="146" y="90" width="8" height="60" rx="0.5" />
           <rect x="144" y="87" width="12" height="3" />
           <rect x="144" y="148" width="12" height="2" />
-        </g>
+        </motion.g>
 
         {/* Architrave & Frieze */}
-        <rect x="36" y="80" width="128" height="8" fill="url(#metalGold)" />
+        <motion.rect 
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          style={{ originX: "100px" }}
+          x="36" y="80" width="128" height="8" fill="url(#metalGold)" 
+        />
         <line x1="38" y1="84" x2="162" y2="84" stroke="#0f172a" strokeWidth="1" />
 
-        {/* Pediment (Triangle Top) */}
-        <path
-          d="M 34 80 L 166 80 L 100 48 Z"
-          fill="#0f172a"
-          stroke="url(#metalGold)"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-        />
-        
-        {/* Emblem inside Pediment (Ashoka Chakra Simplified) */}
-        <circle cx="100" cy="69" r="6" stroke="url(#metalGold)" strokeWidth="1" />
-        <circle cx="100" cy="69" r="2" fill="url(#metalGold)" />
+        {/* Pediment (Triangle Top), Dome, Ashoka emblem */}
+        <motion.g
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.7, ease: "easeOut" }}
+        >
+          {/* Pediment */}
+          <path
+            d="M 34 80 L 166 80 L 100 48 Z"
+            fill="#0f172a"
+            stroke="url(#metalGold)"
+            strokeWidth="2.5"
+            strokeLinejoin="round"
+          />
+          
+          {/* Emblem inside Pediment (Ashoka Chakra Simplified) */}
+          <circle cx="100" cy="69" r="6" stroke="url(#metalGold)" strokeWidth="1" />
+          <circle cx="100" cy="69" r="2" fill="url(#metalGold)" />
 
-        {/* Dome (Satyamev Jayate Dome visual) */}
-        <path
-          d="M 65 48 C 65 24, 135 24, 135 48 Z"
-          fill="none"
-          stroke="url(#metalGold)"
-          strokeWidth="2"
-          strokeDasharray="4,2"
-          opacity="0.75"
-        />
-        <path
-          d="M 75 48 C 75 32, 125 32, 125 48 Z"
-          fill="none"
-          stroke="url(#metalGold)"
-          strokeWidth="1.5"
-        />
-        {/* Dome Spire */}
-        <line x1="100" y1="30" x2="100" y2="15" stroke="url(#metalGold)" strokeWidth="1.5" />
-        <circle cx="100" cy="13" r="2.5" fill="url(#metalGold)" />
+          {/* Dome (Satyamev Jayate Dome visual) */}
+          <path
+            d="M 65 48 C 65 24, 135 24, 135 48 Z"
+            fill="none"
+            stroke="url(#metalGold)"
+            strokeWidth="2"
+            strokeDasharray="4,2"
+            opacity="0.75"
+          />
+          <path
+            d="M 75 48 C 75 32, 125 32, 125 48 Z"
+            fill="none"
+            stroke="url(#metalGold)"
+            strokeWidth="1.5"
+          />
+          {/* Dome Spire */}
+          <line x1="100" y1="30" x2="100" y2="15" stroke="url(#metalGold)" strokeWidth="1.5" />
+          <circle cx="100" cy="13" r="2.5" fill="url(#metalGold)" />
+        </motion.g>
 
         {/* Gate/Doorway in Center (Pillars 3 and 4) */}
-        <path
+        <motion.path
+          initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          transition={{ duration: 0.5, delay: 1, ease: "easeOut" }}
+          style={{ originY: "150px" }}
           d="M 94 150 L 94 115 C 94 110, 106 110, 106 115 L 106 150 Z"
           fill="rgba(16, 185, 129, 0.1)"
           stroke="url(#metalGold)"
@@ -143,10 +182,10 @@ export default function CourthouseComponent() {
       
       {/* Outer Floating Digital HUD brackets */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-2 left-2 w-6 h-6 border-t-2 border-l-2 border-emerald-500/30" />
-        <div className="absolute top-2 right-2 w-6 h-6 border-t-2 border-r-2 border-emerald-500/30" />
-        <div className="absolute bottom-2 left-2 w-6 h-6 border-b-2 border-l-2 border-emerald-500/30" />
-        <div className="absolute bottom-2 right-2 w-6 h-6 border-b-2 border-r-2 border-emerald-500/30" />
+        <div className="absolute top-2 left-2 w-6 h-6 border-t-2 border-l-2 border-emerald-500/30 animate-[pulse_2s_infinite]" />
+        <div className="absolute top-2 right-2 w-6 h-6 border-t-2 border-r-2 border-emerald-500/30 animate-[pulse_2s_infinite_0.5s]" />
+        <div className="absolute bottom-2 left-2 w-6 h-6 border-b-2 border-l-2 border-emerald-500/30 animate-[pulse_2s_infinite_1s]" />
+        <div className="absolute bottom-2 right-2 w-6 h-6 border-b-2 border-r-2 border-emerald-500/30 animate-[pulse_2s_infinite_1.5s]" />
       </div>
     </div>
   );

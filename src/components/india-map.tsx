@@ -173,7 +173,7 @@ export default function IndiaMapComponent() {
       </div>
 
       {/* Floating Detailed Panel showing active selection */}
-      <div className="absolute bottom-4 left-4 right-4 h-24 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 flex flex-col justify-center">
+      <div className="absolute bottom-4 left-4 right-4 h-24 glass-panel rounded-2xl p-4 flex flex-col justify-center border-white/5 shadow-2xl">
         <AnimatePresence mode="wait">
           {selectedHub ? (
             <motion.div

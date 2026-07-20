@@ -58,9 +58,10 @@ export default function NeuralNetworkCanvas() {
       }
 
       draw(context: CanvasRenderingContext2D) {
+        const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        context.fillStyle = "rgba(195, 155, 52, 0.6)"; // brand gold glow
+        context.fillStyle = isDark ? "rgba(195, 155, 52, 0.6)" : "rgba(16, 185, 129, 0.6)";
         context.fill();
       }
     }
@@ -72,6 +73,10 @@ export default function NeuralNetworkCanvas() {
 
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
+
+      const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+      const colorStr = isDark ? "195, 155, 52" : "16, 185, 129";
+      const mouseColorStr = isDark ? "16, 185, 129" : "195, 155, 52";
 
       // Update and draw particles
       particles.forEach((p) => {
@@ -93,7 +98,7 @@ export default function NeuralNetworkCanvas() {
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(195, 155, 52, ${alpha})`;
+            ctx.strokeStyle = `rgba(${colorStr}, ${alpha})`;
             ctx.lineWidth = 0.8;
             ctx.stroke();
           }
@@ -111,7 +116,7 @@ export default function NeuralNetworkCanvas() {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = `rgba(16, 185, 129, ${alpha})`; // emerald accent
+            ctx.strokeStyle = `rgba(${mouseColorStr}, ${alpha})`;
             ctx.lineWidth = 0.9;
             ctx.stroke();
           }

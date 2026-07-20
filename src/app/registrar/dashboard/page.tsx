@@ -23,6 +23,9 @@ import {
   QrCode
 } from "lucide-react";
 import { apiListPetitions, apiUpdatePetitionCnr, apiUpdatePetitionStatus, apiSaveArchive } from "@/utils/api";
+import AssistantSidebar from "@/components/assistant-sidebar";
+import TiltCard from "@/components/tilt-card";
+import RippleWrapper from "@/components/ripple-wrapper";
 
 interface PetitionCase {
   id: string;
@@ -149,7 +152,6 @@ export default function RegistrarDashboard() {
       
       setCases(combined);
       
-      // Update local state tracking for filters
       const completedCnrIds = rawPetitions
         .filter((p: any) => p.status === "CNR Issued" || p.status === "Hearings Active" || p.status === "Disposed")
         .map((p: any) => p.id);
@@ -255,77 +257,75 @@ export default function RegistrarDashboard() {
   });
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row min-h-screen bg-slate-950 text-slate-100 text-xs sm:text-sm">
+    <div className="flex-1 flex flex-col md:flex-row min-h-screen bg-slate-50 dark:bg-[#030712] text-slate-805 dark:text-slate-100 text-xs sm:text-sm">
       
+      {/* AI Assistant Sidebar */}
+      <AssistantSidebar role="registrar" />
+
       {/* SIDEBAR */}
-      <aside className="w-full md:w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0 p-4">
+      <aside className="w-full md:w-64 bg-white/40 dark:bg-slate-900/30 border-r border-black/5 dark:border-white/5 flex flex-col justify-between shrink-0 p-4 backdrop-blur-2xl">
         <div className="space-y-6">
-          <div className="flex items-center gap-2 px-2 pb-4 border-b border-slate-800/80">
-            <div className="w-7 h-7 rounded bg-gradient-to-tr from-yellow-600 to-emerald-600 flex items-center justify-center font-bold text-white text-xs">
+          <div className="flex items-center gap-2 px-2 pb-4 border-b border-black/5 dark:border-white/5">
+            <motion.div 
+              whileHover={{ scale: 1.05, rotate: 3 }}
+              className="w-7 h-7 rounded bg-gradient-to-tr from-yellow-600 to-emerald-600 flex items-center justify-center font-bold text-white text-xs shadow-lg"
+            >
               NF
-            </div>
-            <span className="font-bold tracking-wider text-slate-100">
+            </motion.div>
+            <span className="font-bold tracking-wider text-slate-800 dark:text-slate-100">
               NYAYA<span className="text-yellow-500">FLOW</span>
             </span>
           </div>
 
-          <div className="flex gap-3 items-center p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
-            <div className="w-9 h-9 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center font-bold text-cyan-400">
+          <div className="flex gap-3 items-center p-3 bg-white/60 dark:bg-slate-950/40 rounded-2xl border border-black/5 dark:border-white/5 shadow-inner">
+            <div className="w-9 h-9 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center font-bold text-cyan-500">
               RC
             </div>
-            <div>
-              <p className="font-bold text-slate-200">Registrar Clerk</p>
-              <p className="text-[10px] text-slate-500">Subordinate Registry</p>
+            <div className="text-left">
+              <p className="font-bold text-slate-700 dark:text-slate-200">{user?.full_name || "Registrar Clerk"}</p>
+              <p className="text-[10px] text-slate-400">Subordinate Registry</p>
             </div>
           </div>
 
           {/* Navigation Items */}
-          <nav className="flex flex-col gap-1">
-            <button
-              onClick={() => setActiveTab("pending")}
-              className={`w-full p-2.5 rounded-lg flex items-center gap-3 font-semibold transition-all text-left ${
-                activeTab === "pending"
-                  ? "bg-yellow-500 text-slate-950"
-                  : "text-slate-400 hover:bg-slate-850 hover:text-slate-200"
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-              Pending Petitions
-            </button>
-
-            <button
-              onClick={() => setActiveTab("accepted")}
-              className={`w-full p-2.5 rounded-lg flex items-center gap-3 font-semibold transition-all text-left ${
-                activeTab === "accepted"
-                  ? "bg-yellow-500 text-slate-950"
-                  : "text-slate-400 hover:bg-slate-850 hover:text-slate-200"
-              }`}
-            >
-              <CheckCircle className="w-4 h-4" />
-              Accepted (CNR Linked)
-            </button>
-
-            <button
-              onClick={() => setActiveTab("returned")}
-              className={`w-full p-2.5 rounded-lg flex items-center gap-3 font-semibold transition-all text-left ${
-                activeTab === "returned"
-                  ? "bg-yellow-500 text-slate-950"
-                  : "text-slate-400 hover:bg-slate-850 hover:text-slate-200"
-              }`}
-            >
-              <AlertTriangle className="w-4 h-4" />
-              Returned Files
-            </button>
+          <nav className="flex flex-col gap-1.5">
+            {[
+              { id: "pending", label: "Pending Petitions", icon: FileText },
+              { id: "accepted", label: "Registered (CNR Issued)", icon: CheckCircle },
+              { id: "returned", label: "Returned Petitions", icon: AlertTriangle },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <motion.button
+                  key={tab.id}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full p-3 rounded-xl flex items-center gap-3 font-semibold transition-all text-left cursor-pointer border ${
+                    isActive
+                      ? "bg-yellow-500 border-yellow-405 text-slate-950 shadow-lg shadow-yellow-500/10"
+                      : "text-slate-500 dark:text-slate-400 border-transparent hover:bg-black/5 dark:hover:bg-white/5 hover:text-slate-808 dark:hover:text-slate-200"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </motion.button>
+              );
+            })}
           </nav>
         </div>
 
-        <div className="pt-4 border-t border-slate-850">
-          <Link
-            href="/auth"
-            className="w-full p-2.5 rounded-lg flex items-center gap-3 text-slate-400 hover:bg-slate-850 hover:text-red-400 transition-all font-semibold"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out Portal
+        <div className="pt-4 border-t border-black/5 dark:border-white/5">
+          <Link href="/auth">
+            <motion.div
+              whileHover={{ scale: 1.01, backgroundColor: "rgba(239, 68, 68, 0.05)" }}
+              whileTap={{ scale: 0.99 }}
+              className="w-full p-3 rounded-xl flex items-center gap-3 text-slate-400 hover:text-red-500 transition-all font-semibold cursor-pointer border border-transparent"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out Portal
+            </motion.div>
           </Link>
         </div>
       </aside>
@@ -334,302 +334,239 @@ export default function RegistrarDashboard() {
       <main className="flex-1 p-6 md:p-8 overflow-y-auto w-full space-y-6">
         
         {/* Header Title */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-between items-center pb-4 border-b border-black/5 dark:border-white/5 flex-wrap gap-4 text-left"
+        >
           <div>
-            <h1 className="text-xl font-black text-slate-100 flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-yellow-500" />
-              Registry Scrutiny Workspace
+            <h1 className="text-xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <Building className="w-5 h-5 text-cyan-505" />
+              Registrar Scrutiny Registry
             </h1>
-            <p className="text-slate-400 text-xs">Verify digital filing packets, catalog physical files, and record court CNR identifiers.</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs">Verify scanned documents health scores, audit duplicates, assign official court CNRs, and log physical archives storage locations.</p>
           </div>
+        </motion.div>
 
-          {/* Search box */}
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search by litigant or category..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-xs focus:outline-none focus:border-yellow-500 text-slate-200"
-            />
-          </div>
-        </div>
-
-        {/* WORKSPACE CONTENT GRID */}
+        {/* WORKSPACE GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* LEFT COLUMN: PENDING PETITIONS LIST */}
-          <div className="lg:col-span-4 space-y-4">
-            <h3 className="text-sm font-bold text-slate-300">Petitions Inbox ({filteredCases.length})</h3>
-            
-            {filteredCases.length === 0 ? (
-              <div className="p-8 text-center bg-slate-900 border border-slate-850 rounded-2xl text-slate-500 text-xs">
-                No petitions found matching filters.
+          {/* LEFT LIST PANEL */}
+          <div className="lg:col-span-4 space-y-4 text-left">
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-slate-600 dark:text-slate-350 px-1">Submissions Queue</h3>
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-550" />
+                <input
+                  type="text"
+                  placeholder="Search applicant or type..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white/60 dark:bg-slate-950/60 border border-black/5 dark:border-white/5 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-808 dark:text-slate-200 focus:outline-none"
+                />
               </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredCases.map((c) => {
-                  const isSelected = selectedCaseId === c.id;
-                  return (
+            </div>
+
+            <div className="space-y-3">
+              {filteredCases.map((c) => {
+                const isSelected = selectedCaseId === c.id;
+                return (
+                  <TiltCard key={c.id}>
                     <div
-                      key={c.id}
                       onClick={() => setSelectedCaseId(c.id)}
-                      className={`p-4 rounded-xl border cursor-pointer text-left transition-all ${
+                      className={`p-4 rounded-2xl border cursor-pointer text-left transition-all ${
                         isSelected
-                          ? "bg-slate-900 border-yellow-500/60 shadow-lg scale-102"
-                          : "bg-slate-900/40 border-slate-850 hover:border-slate-800"
+                          ? "bg-white dark:bg-slate-900/40 border-yellow-500/60 shadow-lg scale-102"
+                          : "bg-white/40 dark:bg-slate-955/30 border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10"
                       }`}
                     >
                       <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-bold text-slate-200">{c.applicant}</h4>
-                          <p className="text-[10px] text-slate-500 mt-0.5">{c.type}</p>
-                        </div>
-                        <span className="text-[9px] text-slate-400">{c.date}</span>
-                      </div>
-                      <div className="mt-3 flex justify-between items-center text-[10px]">
-                        <span className={`px-1.5 py-0.5 rounded font-bold ${
-                          c.healthScore >= 85 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
-                        }`}>
-                          Doc Score: {c.healthScore}%
+                        <span className="text-[9px] font-mono text-slate-500 font-semibold">{c.date}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 font-bold">
+                          Score: {c.healthScore}%
                         </span>
-                        {c.hasDuplicates && (
-                          <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 font-bold flex items-center gap-1">
-                            ⚠️ Duplicate
-                          </span>
-                        )}
                       </div>
+                      <h4 className="font-bold text-slate-805 dark:text-slate-202 mt-2">{c.applicant}</h4>
+                      <p className="text-[10px] text-slate-500 mt-0.5">{c.type}</p>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                  </TiltCard>
+                );
+              })}
+            </div>
           </div>
 
-          {/* RIGHT COLUMN: DETAIL WORKSPACE PANEL */}
+          {/* RIGHT DETAIL WORKSPACE PANEL */}
           <div className="lg:col-span-8 space-y-6">
             <AnimatePresence mode="wait">
-              {filteredCases.length > 0 && selectedCase ? (
+              {selectedCase && (
                 <motion.div
                   key={selectedCase.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6 glass-panel"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white/40 dark:bg-slate-900/30 border border-black/5 dark:border-white/5 rounded-3xl p-6 md:p-8 shadow-xl space-y-6 glass-panel text-left"
                 >
-                  {/* Case Header */}
-                  <div className="flex justify-between items-start border-b border-slate-800 pb-4">
+                  <div className="flex justify-between items-start border-b border-black/5 dark:border-white/5 pb-4 flex-wrap gap-2">
                     <div>
-                      <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-wide">
-                        Scrutiny Case: {selectedCase.id}
+                      <span className="text-[10px] font-bold text-yellow-605 dark:text-yellow-500 uppercase tracking-wider">
+                        Scrutiny Case ID: {selectedCase.id}
                       </span>
-                      <h3 className="text-md font-bold text-slate-100 mt-1">
-                        {selectedCase.applicant} v. Respondent
+                      <h3 className="text-base font-extrabold text-slate-805 dark:text-slate-100 mt-1.5">
+                        Applicant: {selectedCase.applicant}
                       </h3>
-                      <p className="text-xs text-slate-500">{selectedCase.type}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{selectedCase.type}</p>
                     </div>
-                    <div className="text-right">
-                      <span className="px-2 py-1 rounded bg-slate-950 text-slate-400 text-xs border border-slate-850">
-                        Registry Scrutiny Phase
-                      </span>
-                    </div>
+                    <span className="px-2.5 py-1 rounded bg-yellow-500/10 text-yellow-600 dark:text-yellow-450 border border-yellow-500/20 text-[10px] font-bold">
+                      {registeredCases.includes(selectedCase.id) ? "CNR Issued" : (returnedCases.includes(selectedCase.id) ? "Returned" : "Scrutiny Pending")}
+                    </span>
                   </div>
 
-                  {/* AI Assistant automatically extracted details */}
-                  <div className="border border-yellow-500/20 bg-slate-950/40 p-4 rounded-xl space-y-4">
-                    <h4 className="font-bold text-yellow-500 flex items-center gap-1.5">
-                      <Sliders className="w-4 h-4" />
-                      AI Assistant Scrutiny Extraction (Advisory)
-                    </h4>
+                  {/* Summary Card */}
+                  <div className="space-y-2">
+                    <p className="text-slate-505 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">Case Narrative Abstract:</p>
+                    <p className="text-xs text-slate-655 dark:text-slate-350 leading-relaxed bg-white/60 dark:bg-slate-950/40 p-4 rounded-2xl border border-black/5 dark:border-white/5 shadow-inner">
+                      {selectedCase.summary}
+                    </p>
+                  </div>
 
-                    <div className="text-slate-300 space-y-2">
-                      <p className="font-semibold text-slate-200">Automated Summary Brief:</p>
-                      <p className="text-xs text-slate-400 leading-relaxed bg-slate-900/50 p-2.5 rounded-lg border border-slate-850">
-                        {selectedCase.summary}
-                      </p>
+                  {/* Document audit files lists & score */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <p className="text-slate-505 dark:text-slate-450 font-bold uppercase text-[10px] tracking-wider">Filing Document Health Score:</p>
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-14 h-14 rounded-full border-4 border-yellow-500/20 border-t-yellow-500 flex items-center justify-center font-black text-yellow-605 dark:text-yellow-500 text-base shadow-lg animate-pulse-gold">
+                          {selectedCase.healthScore}%
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-700 dark:text-slate-200 text-xs">OCR health target passed</p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">Threshold 85% required</p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                      <div>
-                        <p className="text-slate-500 font-semibold">Suggested Jurisdictional Court:</p>
-                        <p className="text-slate-200 font-bold">{selectedCase.suggestedCourt}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500 font-semibold">Missing/Suggested Documents Checklist:</p>
-                        <ul className="list-disc pl-4 text-slate-400 space-y-0.5 text-[11px]">
-                          {selectedCase.missingFiles.map((f, i) => (
-                            <li key={i}>{f}</li>
+                    <div className="space-y-3 text-left">
+                      <p className="text-slate-505 dark:text-slate-450 font-bold uppercase text-[10px] tracking-wider">Required Document Completeness Checklist:</p>
+                      {selectedCase.missingFiles.length === 0 ? (
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 text-[9px] font-bold uppercase">
+                          ✓ All documents attached
+                        </span>
+                      ) : (
+                        <div className="space-y-1.5">
+                          {selectedCase.missingFiles.map((f) => (
+                            <span key={f} className="block px-2.5 py-1 rounded-lg bg-red-500/5 border border-red-500/20 text-red-500 dark:text-red-400 text-[10px] font-semibold leading-normal">
+                              ⚠ Missing: {f}
+                            </span>
                           ))}
-                        </ul>
-                      </div>
+                        </div>
+                      )}
                     </div>
-
-                    {selectedCase.hasDuplicates && (
-                      <div className="p-3 bg-red-500/5 border border-red-500/20 text-red-400 rounded-lg flex items-start gap-2.5 text-[11px]">
-                        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                        <span><strong>Duplicate Check Warning:</strong> {selectedCase.duplicateInfo}</span>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Document attachments list */}
-                  <div className="space-y-3">
-                    <h4 className="font-bold text-slate-300 flex items-center gap-1.5">
-                      <FileText className="w-4 h-4 text-emerald-400" />
-                      Uploaded Documents Health Audit
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Duplicate checks warnings */}
+                  {selectedCase.hasDuplicates && (
+                    <div className="p-4 bg-red-500/5 border border-red-500/15 rounded-2xl flex gap-3 text-xs">
+                      <AlertTriangle className="w-5 h-5 text-red-500 dark:text-red-450 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-red-500 dark:text-red-455 uppercase text-[10px] tracking-wider">Overlap / Duplicate warning detected by AI</p>
+                        <p className="text-slate-550 dark:text-slate-400 mt-1 leading-relaxed text-[11px]">{selectedCase.duplicateInfo}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Document ledger table */}
+                  <div className="space-y-2.5">
+                    <p className="text-slate-505 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">Scanned Document Attachments ({selectedCase.documents.length}):</p>
+                    <div className="space-y-2">
                       {selectedCase.documents.map((doc, idx) => (
-                        <div
-                          key={idx}
-                          className="p-3 bg-slate-950/40 border border-slate-850 rounded-xl flex justify-between items-center gap-4 text-xs"
-                        >
-                          <div>
-                            <p className="font-bold text-slate-300 truncate max-w-[180px]">{doc.name}</p>
-                            <p className="text-[10px] text-slate-500 mt-0.5">{doc.type}</p>
-                          </div>
-                          <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                            doc.status === "Verified"
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                              : "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
-                          }`}>
-                            {doc.status}
-                          </span>
+                        <div key={idx} className="flex justify-between items-center p-3 bg-white/60 dark:bg-slate-955/20 border border-black/5 dark:border-white/5 rounded-xl text-xs flex-wrap gap-2">
+                          <span className="font-bold text-slate-705 dark:text-slate-300">{doc.name}</span>
+                          <span className="px-2 py-0.5 rounded-lg bg-black/5 dark:bg-slate-900 border border-black/5 dark:border-white/5 text-[9px] text-slate-500 dark:text-slate-400 font-bold">{doc.type}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Physical archival logger form */}
-                  <div className="border border-slate-850 p-4 rounded-xl space-y-4">
-                    <h4 className="font-bold text-slate-300 flex items-center gap-1.5">
-                      <Archive className="w-4 h-4 text-yellow-500" />
-                      Link Physical Archive Location
-                    </h4>
-                    <p className="text-slate-500 text-[10px] leading-normal">
-                      Input the exact location details once physical copies are received and verified by the clerk.
-                    </p>
+                  {/* Actions Grid */}
+                  <div className="pt-6 border-t border-black/5 dark:border-white/5 grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                    
+                    {/* Part A: Issue CNR number */}
+                    <div className="space-y-3">
+                      <h4 className="font-bold text-slate-700 dark:text-slate-200 text-xs">Acknowledge Scrutiny & Issue CNR</h4>
+                      <p className="text-[10px] text-slate-500 leading-normal">Assign the standard unique 16-character CNR number to verify official registration in the High Court cause records.</p>
+                      
+                      {registeredCases.includes(selectedCase.id) ? (
+                        <div className="flex gap-2 items-center text-emerald-600 dark:text-emerald-455 font-bold text-xs sm:text-sm bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 rounded-xl">
+                          <CheckCircle className="w-4 h-4 text-emerald-500" /> Court Registered (CNR Transmitted)
+                        </div>
+                      ) : (
+                        <form onSubmit={handleRegisterCnr} className="flex gap-2">
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g., MHPU02-89210-2026"
+                            value={officialCnr}
+                            onChange={(e) => setOfficialCnr(e.target.value)}
+                            className="bg-white/60 dark:bg-slate-950/60 border border-black/5 dark:border-white/5 rounded-xl px-3 py-2 text-xs text-slate-808 dark:text-slate-100 focus:outline-none flex-1"
+                          />
+                          <RippleWrapper>
+                            <button
+                              type="submit"
+                              disabled={actionLoading}
+                              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold rounded-xl text-xs cursor-pointer"
+                            >
+                              Register
+                            </button>
+                          </RippleWrapper>
+                        </form>
+                      )}
+                    </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                      <div>
-                        <label className="text-slate-400 font-semibold">Building</label>
-                        <input
-                          type="text"
-                          value={archiveForm.building}
-                          onChange={(e) => setArchiveForm({ ...archiveForm, building: e.target.value })}
-                          className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 focus:outline-none"
-                        />
+                    {/* Part B: Physical Archive Location Details */}
+                    <div className="space-y-3 border-l-0 sm:border-l border-black/5 dark:border-white/5 pl-0 sm:pl-6">
+                      <h4 className="font-bold text-slate-700 dark:text-slate-200 text-xs">Link Physical Archive Location</h4>
+                      <p className="text-[10px] text-slate-500 leading-normal">Map scanned profiles to physical locations using barcodes and room bounds.</p>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-[10px]">
+                        <div className="space-y-1">
+                          <span className="text-slate-500">Building</span>
+                          <input
+                            type="text"
+                            value={archiveForm.building}
+                            onChange={(e) => setArchiveForm({ ...archiveForm, building: e.target.value })}
+                            className="w-full bg-white/60 dark:bg-slate-955/60 border border-black/5 dark:border-white/5 rounded px-2 py-1 text-slate-708 dark:text-slate-300"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-slate-500">Box ID / Room</span>
+                          <input
+                            type="text"
+                            value={archiveForm.box}
+                            onChange={(e) => setArchiveForm({ ...archiveForm, box: e.target.value })}
+                            className="w-full bg-white/60 dark:bg-slate-955/60 border border-black/5 dark:border-white/5 rounded px-2 py-1 text-slate-708 dark:text-slate-300"
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <label className="text-slate-400 font-semibold">Floor / Room</label>
-                        <input
-                          type="text"
-                          value={archiveForm.room}
-                          onChange={(e) => setArchiveForm({ ...archiveForm, room: e.target.value })}
-                          className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 focus:outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-slate-400 font-semibold">Rack No</label>
-                        <input
-                          type="text"
-                          value={archiveForm.rack}
-                          onChange={(e) => setArchiveForm({ ...archiveForm, rack: e.target.value })}
-                          className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 focus:outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-slate-400 font-semibold">Shelf / Cupboard</label>
-                        <input
-                          type="text"
-                          value={archiveForm.shelf}
-                          onChange={(e) => setArchiveForm({ ...archiveForm, shelf: e.target.value })}
-                          className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 focus:outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-slate-400 font-semibold">Box Number</label>
-                        <input
-                          type="text"
-                          value={archiveForm.box}
-                          onChange={(e) => setArchiveForm({ ...archiveForm, box: e.target.value })}
-                          className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 focus:outline-none"
-                        />
-                      </div>
-                      <div className="flex items-end">
+                      
+                      <RippleWrapper>
                         <button
                           type="button"
                           onClick={handleSaveArchive}
-                          disabled={actionLoading || archivedCases.includes(selectedCase.id)}
-                          className="w-full py-1.5 bg-slate-950 border border-slate-800 hover:border-yellow-500/40 text-yellow-500 font-bold rounded flex justify-center items-center gap-1 cursor-pointer"
+                          disabled={actionLoading}
+                          className="w-full py-2 bg-white dark:bg-slate-950 hover:bg-black/5 dark:hover:bg-white/5 border border-black/10 dark:border-white/5 text-yellow-600 dark:text-yellow-500 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
                         >
-                          <Barcode className="w-3.5 h-3.5" /> 
-                          {archivedCases.includes(selectedCase.id) ? "Location Linked" : "Save Archive"}
+                          <Archive className="w-3.5 h-3.5" /> Save Archival Link
                         </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Official CNR Assignment panel */}
-                  <div className="border border-slate-850 p-4 rounded-xl space-y-4">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-bold text-slate-300 flex items-center gap-1.5">
-                        <QrCode className="w-4 h-4 text-emerald-400" />
-                        Official court system CNR Linkage
-                      </h4>
-                      <span className="text-[10px] text-yellow-500/90 font-medium">
-                        ⚠️ NyayaFlow AI NEVER generates official CNR numbers.
-                      </span>
+                      </RippleWrapper>
                     </div>
 
-                    <form onSubmit={handleRegisterCnr} className="space-y-4">
-                      <div className="space-y-1">
-                        <label className="text-slate-400 font-semibold">Enter Official Court CNR Identifiers</label>
-                        <input
-                          type="text"
-                          required
-                          value={officialCnr}
-                          onChange={(e) => setOfficialCnr(e.target.value)}
-                          placeholder="e.g., MHPU02-00891-2026"
-                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-yellow-500/80 text-xs sm:text-sm"
-                        />
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <button
-                          type="button"
-                          onClick={handleReturnCase}
-                          disabled={actionLoading}
-                          className="px-4 py-2 border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 font-bold rounded-lg cursor-pointer"
-                        >
-                          Return Petition (With Scrutiny Feedback)
-                        </button>
-
-                        <button
-                          type="submit"
-                          disabled={actionLoading}
-                          className="px-5 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold rounded-lg flex items-center gap-1 cursor-pointer shadow-lg"
-                        >
-                          {actionLoading ? (
-                            <>
-                              <RefreshCw className="w-4 h-4 animate-spin" /> Linkage processing...
-                            </>
-                          ) : (
-                            <>Confirm & Register CNR</>
-                          )}
-                        </button>
-                      </div>
-                    </form>
                   </div>
+
                 </motion.div>
-              ) : (
-                <div className="p-8 text-center bg-slate-900 border border-slate-850 rounded-2xl text-slate-500">
-                  Select a pending petition from the list to begin audit checks.
-                </div>
               )}
             </AnimatePresence>
           </div>
+
         </div>
       </main>
     </div>
