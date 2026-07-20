@@ -17,8 +17,11 @@ class DatabaseManager:
             return psycopg2.connect(self.db_url)
         else:
             # SQLite connection
+            db_path = os.path.join(os.path.dirname(__file__), "nyayaflow.db")
+            if os.getenv("VERCEL"):
+                db_path = "/tmp/nyayaflow.db"
             conn = sqlite3.connect(
-                os.path.join(os.path.dirname(__file__), "nyayaflow.db"),
+                db_path,
                 detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
             )
             # Enable row factory for dictionary-like results
